@@ -11,30 +11,31 @@
 #   @jbz
 
 module.exports = (robot) ->
-  robot.respond /(?:cancel|stop) rollcall *$/i, (msg) ->
+  robot.respond /rollcall (?:cancel|stop) *$/i, (msg) ->
     delete robot.brain.data.rollcall?[msg.message.user.room]
     msg.send "Rollcall cancelled"
 
   robot.respond /rollcall\?? *$/i, (msg) ->
     msg.send """
-             rollcall <user1> ... <userN> - start a rollcall for the listed users
-             cancel rollcall - cancel the current rollcall 
-             skip <user> - skip someone because they're not available or are unnecessary
+             #{robot.name} rollcall start <user1> ... <userN> - start a rollcall for the listed users
+             #{robot.name} rollcall cancel - cancel the current rollcall 
+             #{robot.name} rollcall status - see who we're still waiting for
+             #{robot.name} here|present|raised_hand - indicate you are present for the rollcall
+             #{robot.name} sub|substitute|stand-in for <user> - indicate you are subbing for <user>
              """
   robot.respond /debug/, (msg) ->
     console.log Object(msg)
 
-  robot.respond /start rollcall (.*?) *$/i, (msg) ->
-    room  = msg.message.user.room
+  robot.respond /rollcall start (.*?) *$/i, (msg) ->
+    room = msg.message.room
     if robot.brain.data.rollcall?[room]
-      msg.send "There is already a rollcall in progress in #{robot.brain.data.rollcall[room]}! Cancel it first with 'cancel rollcall'"
+      msg.send "There is already a rollcall in progress here! Cancel it first with '#{robot.name} rollcall cancel'"
+      return
 
     # Get list of actual usernames in rollcall list
     attendees = (msg.match[1].split " ").filter (x) -> x.charAt(0) == "@" 
     attendees = attendees.unique()
-    msg.send "I see the following attendees:"
-    for attendee in attendees
-      msg.send "#{attendee}"
+    msg.send "Starting a rollcall for the following attendees: #{attendees.join(" ")}"
 
     # Store new rollcall in brain
     robot.brain.data.rollcall or= {}
@@ -42,45 +43,47 @@ module.exports = (robot) ->
       start: new Date(),
       attendees: attendees,
       remaining: attendees,
-      log: [],
     }
 
-  robot.respond /(?:\bhere\b|\bpresent\b)/i, (msg) ->
-    room = msg.message.user.room
-    msg.send "Saw a hand raised!"
-    if robot.brain.data.rollcall?[room]
+  robot.respond /(?:\bhere\b|\bpresent\b|raised_hand)/, (msg) ->
+    room = msg.message.room
+    if robot.brain.data.rollcall?[room] and not robot.brain.data.rollcall[room].finish?
       rollcall = robot.brain.data.rollcall[room]
       roster = rollcall.remaining
       if ("@" + msg.message.user.name) in rollcall.remaining
-        msg.send "#{msg.message.user.name} is here!"
-        msg.send "Removing from rollcall..."
+        msg.send "@#{msg.message.user.name} is here!"
         newAttendees = roster.filter (e) -> e != ("@" + msg.message.user.name)
         if newAttendees.length == 0
-          msg.send "EMPTY ROLLCALL!"
-          robot.brain.data.rollcall[room].finish = new Date()
-          msg.send "Finish time is #{formatDate(robot.brain.data.rollcall[room].finish)}"
+          completeRollcall(msg)
         robot.brain.data.rollcall[room].remaining = newAttendees
+        msg.send "(#{newAttendees.length}/#{rollcall.attendees.length}) are here!"
       else
-        msg.send "Don't know you." # Eventually, ignore
+        msg.send "You're not in the rollcall." # Eventually, ignore
+    else
+      msg.send "No rollcall in progress."
 
-  robot.respond /(?:\bsub\b|\bsubstitute\b|\bhere\b) for (\@.*?) *$/i, (msg) ->
-    room = msg.message.user.room
-    sub = msg.match[1]
-    msg.send "#{sub}"
-    msg.send "Saw a substitute volunteer!"
-    if robot.brain.data.rollcall?[room]
+  robot.respond /(?:\bsub\b|\bsubstitute\b|\bstandin\b|stand-in\b) for (\@.*?) *$/i, (msg) ->
+    room = msg.message.room
+    absent = msg.match[1]
+    if robot.brain.data.rollcall?[room] and not robot.brain.data.rollcall[room].finish?
       rollcall = robot.brain.data.rollcall[room]
       roster = rollcall.remaining
-      if sub in rollcall.remaining
-        msg.send "#{msg.message.user.name} is standing in for #{sub}!"
-        newAttendees = roster.filter (e) -> e != sub
+      if absent in rollcall.remaining
+        msg.send "@#{msg.message.user.name} is standing in for #{absent}!"
+        newAttendees = roster.filter (e) -> e != absent
         if newAttendees.length == 0
-          msg.send "ROLLCALL COMPLETE!"
-          robot.brain.data.rollcall[room].finish = new Date()
-          msg.send "Finish time is #{formatDate(robot.brain.data.rollcall[room].finish)}"
+          completeRollcall(msg)
         robot.brain.data.rollcall[room].remaining = newAttendees
       else
-        msg.send "Don't know you." # Eventually, ignore
+        msg.send "We're not waiting for that person!"
+    else
+      msg.send "No rollcall in progress."
+
+  robot.respond /rollcall status/i, (msg) ->
+    msg.send "Status command"
+    room = msg.message.room
+    if robot.brain.data.rollcall?[room]
+      msg.send "Rollcall in progress.  Waiting for #{robot.brain.data.rollcall[room].remaining.length} of #{robot.brain.data.rollcall[room].attendees.length} paticipants - #{robot.brain.data.rollcall[room].remaining.join(' ')}"
 
 formatDate = (date) ->
   timeStamp = [(date.getMonth() + 1), date.getDate()].join("/") + " " + [date.getHours(), date.getMinutes()].join(":")
@@ -95,3 +98,8 @@ Array::unique = ->
   output = {}
   output[@[key]] = @[key] for key in [0...@length]
   value for key, value of output
+
+completeRollcall = (msg) ->
+  room = msg.message.room
+  robot.brain.data.rollcall[room].finish = new Date()
+  msg.send "Rollcall COMPLETED at #{formatDate(robot.brain.data.rollcall[room].finish)}"
