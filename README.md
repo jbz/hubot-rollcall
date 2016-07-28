@@ -2,6 +2,7 @@
 
 Attendance taking functionality for [hubot](https://github.com/github/hubot).
 Coffeescript and hubot teachings gratefully taken from [hubot-standup](https://github.com/miyagawa/hubot-standup), amongst other places.
+At present, only tested on Slack (username handling is probably Slack-centric).
 
 ## How to use
 
