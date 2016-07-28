@@ -4,8 +4,10 @@
 # Commands:
 #   hubot rollcall? - show help for the rollcall
 #   hubot rollcall <user1> <user2> ... <userN> - start a rollcall of the named users
-#   hubot cancel rollcall - cancel the current rollcall
-#   hubot skip <user> - skip someone when they're not available
+#   hubot rollcall cancel - cancel the current rollcall
+#   hubot rollcall status - get status of current rollcall
+#   hubot here|present|:raise_hand: - announce your presence for rollcall
+#   hubot sub(stitute)|standin|stand-in for <user1> - act as standin for user1
 #
 # Author:
 #   @jbz
