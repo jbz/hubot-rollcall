@@ -18,7 +18,7 @@ module.exports = (robot) ->
   robot.respond /rollcall\?? *$/i, (msg) ->
     msg.send """
              #{robot.name} rollcall start <user1> ... <userN> - start a rollcall for the listed users
-             #{robot.name} rollcall cancel - cancel the current rollcall 
+             #{robot.name} rollcall cancel - cancel the current rollcall
              #{robot.name} rollcall status - see who we're still waiting for
              #{robot.name} here|present|raised_hand - indicate you are present for the rollcall
              #{robot.name} sub|substitute|stand-in for <user> - indicate you are subbing for <user>
@@ -33,7 +33,7 @@ module.exports = (robot) ->
       return
 
     # Get list of actual usernames in rollcall list
-    attendees = (msg.match[1].split " ").filter (x) -> x.charAt(0) == "@" 
+    attendees = (msg.match[1].split " ").filter (x) -> x.charAt(0) == "@"
     attendees = attendees.unique()
     msg.send "Starting a rollcall at #{formatDate(new Date())} for the following attendees: #{attendees.join(" ")}"
 
