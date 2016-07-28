@@ -1,8 +1,10 @@
 {
+  "main": "index.coffee",
   "author": "J.B. Zimmerman",
   "name": "hubot-rollcall",
   "description": "Rollcall functionality for hubot",
-  "version": "0.1",
+  "license":  "MIT",
+  "version": "0.1.0",
   "homepage": "https://github.com/jbz/hubot-rollcall",
   "repository": {
     "type": "git",
@@ -11,10 +13,16 @@
   "engines": {
     "node": "> 0.6.0"
   },
-  "main": "index.coffee",
-  "dependencies": {
-    "coffee-script": "> 1.1.3"
+  "devDependencies": {
+    "coffee-script": "~1.6",
+    "mocha": "*",
+    "chai": "*",
+    "sinon-chai": "*",
+    "sinon": "*",
+    "matchdep": "~0.1.2"
   },
-  "devDependencies": {},
-  "optionalDependencies": {}
+  "scripts": {
+    "bootstrap": "scripts/bootstrap",
+    "test": "scripts/test"
+  }
 }
