@@ -52,7 +52,9 @@ When the last person (or stand-in) checks in, the rollcall will be announced com
 
 ```
 ianw:  hubot present
-hubot: @ianw is here!  Attendance check COMPLETED at 07.27 14:17
+hubot: @ianw is here!
+hubot: (3/3) present or accounted for!
+hubot: Attendance check COMPLETED at 07/27 14:17
 ```
 
 ### Canceling the rollcall
