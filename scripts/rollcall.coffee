@@ -35,7 +35,7 @@ module.exports = (robot) ->
     # Get list of actual usernames in rollcall list
     attendees = (msg.match[1].split " ").filter (x) -> x.charAt(0) == "@" 
     attendees = attendees.unique()
-    msg.send "Starting a rollcall for the following attendees: #{attendees.join(" ")}"
+    msg.send "Starting a rollcall at #{formatDate(new Date())} for the following attendees: #{attendees.join(" ")}"
 
     # Store new rollcall in brain
     robot.brain.data.rollcall or= {}
@@ -55,6 +55,7 @@ module.exports = (robot) ->
         newAttendees = roster.filter (e) -> e != ("@" + msg.message.user.name)
         if newAttendees.length == 0
           completeRollcall(msg)
+          return
         robot.brain.data.rollcall[room].remaining = newAttendees
         msg.send "(#{newAttendees.length}/#{rollcall.attendees.length}) are here!"
       else
@@ -73,6 +74,7 @@ module.exports = (robot) ->
         newAttendees = roster.filter (e) -> e != absent
         if newAttendees.length == 0
           completeRollcall(msg)
+          return
         robot.brain.data.rollcall[room].remaining = newAttendees
       else
         msg.send "We're not waiting for that person!"
@@ -101,5 +103,6 @@ Array::unique = ->
 
 completeRollcall = (msg) ->
   room = msg.message.room
-  robot.brain.data.rollcall[room].finish = new Date()
-  msg.send "Rollcall COMPLETED at #{formatDate(robot.brain.data.rollcall[room].finish)}"
+  # robot.brain.data.rollcall[room].finish = new Date()
+  delete robot.brain.data.rollcall[room]
+  msg.send "Rollcall COMPLETED at #{formatDate(new Date())}"

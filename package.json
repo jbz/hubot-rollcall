@@ -1,12 +1,12 @@
 {
-  "author": "Tatsuhiko Miyagawa",
-  "name": "hubot-standup",
-  "description": "Standup bot with hubot ala tender",
-  "version": "0.1.8",
-  "homepage": "https://github.com/miyagawa/hubot-standup",
+  "author": "J.B. Zimmerman",
+  "name": "hubot-rollcall",
+  "description": "Rollcall functionality for hubot",
+  "version": "0.1",
+  "homepage": "https://github.com/jbz/hubot-rollcall",
   "repository": {
     "type": "git",
-    "url": "git://github.com/miyagawa/hubot-standup.git"
+    "url": "git://github.com/jbz/hubot-rollcall.git"
   },
   "engines": {
     "node": "> 0.6.0"
