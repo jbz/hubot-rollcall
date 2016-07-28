@@ -45,7 +45,7 @@ module.exports = (robot) ->
       remaining: attendees,
     }
 
-  robot.respond /(?:\bhere\b|\bpresent\b|raised_hand)/, (msg) ->
+  robot.respond /(?:\bhere\b|\bpresent\b|:raised_hand:)/, (msg) ->
     room = msg.message.room
     if robot.brain.data.rollcall?[room] and not robot.brain.data.rollcall[room].finish?
       rollcall = robot.brain.data.rollcall[room]
@@ -59,7 +59,7 @@ module.exports = (robot) ->
         robot.brain.data.rollcall[room].remaining = newAttendees
         msg.send "(#{newAttendees.length}/#{rollcall.attendees.length}) are here!"
       else
-        msg.send "You're not in the rollcall." # Eventually, ignore
+        msg.send "You're not in the rollcall."
     else
       msg.send "No rollcall in progress."
 
@@ -86,6 +86,8 @@ module.exports = (robot) ->
     room = msg.message.room
     if robot.brain.data.rollcall?[room]
       msg.send "Rollcall in progress.  Waiting for #{robot.brain.data.rollcall[room].remaining.length} of #{robot.brain.data.rollcall[room].attendees.length} paticipants - #{robot.brain.data.rollcall[room].remaining.join(' ')}"
+    else
+      msg.send "No rollcall in progress!  Start one with '#{robot.name} rollcall start @user1 ... @userN'"
 
 formatDate = (date) ->
   timeStamp = [(date.getMonth() + 1), date.getDate()].join("/") + " " + [date.getHours(), date.getMinutes()].join(":")
