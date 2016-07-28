@@ -1,6 +1,7 @@
 # hubot-rollcall
 
 Attendance taking functionality for [hubot](https://github.com/github/hubot).
+Coffeescript and hubot teachings gratefully taken from [hubot-standup](https://github.com/miyagawa/hubot-standup), amongst other places.
 
 ## How to use
 
