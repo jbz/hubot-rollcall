@@ -57,9 +57,9 @@ module.exports = (robot) ->
           completeRollcall(msg)
           return
         robot.brain.data.rollcall[room].remaining = newAttendees
-        msg.send "(#{newAttendees.length}/#{rollcall.attendees.length}) are here!"
+        msg.send "(#{rollcall.attendees.length - newAttendees.length}/#{rollcall.attendees.length}) are here!"
       else
-        msg.send "You're not in the rollcall."
+        msg.send "We're not looking for you right now."
     else
       msg.send "No rollcall in progress."
 
@@ -76,6 +76,7 @@ module.exports = (robot) ->
           completeRollcall(msg)
           return
         robot.brain.data.rollcall[room].remaining = newAttendees
+        msg.send "(#{rollcall.attendees.length - newAttendees.length}/#{rollcall.attendees.length}) are here!"
       else
         msg.send "We're not waiting for that person!"
     else
@@ -105,6 +106,7 @@ Array::unique = ->
 
 completeRollcall = (msg) ->
   room = msg.message.room
-  # robot.brain.data.rollcall[room].finish = new Date()
+  count = robot.brain.data.rollcall[room].attendees.length
+  msg.send "(#{count}/#{count}) present or accounted for!"
   delete robot.brain.data.rollcall[room]
   msg.send "Rollcall COMPLETED at #{formatDate(new Date())}"
