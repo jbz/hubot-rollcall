@@ -53,7 +53,7 @@ module.exports = (robot) ->
       rollcall = robot.brain.data.rollcall[room]
       roster = rollcall.remaining
       if ("@" + msg.message.user.name) in rollcall.remaining
-        msg.send "@#{msg.message.user.name} is here!"
+        msg.send "<@#{msg.message.user.id}|#{msg.message.user.name}> is here!"
         newAttendees = roster.filter (e) -> e != ("@" + msg.message.user.name)
         if newAttendees.length == 0
           completeRollcall(msg)
@@ -72,7 +72,7 @@ module.exports = (robot) ->
       rollcall = robot.brain.data.rollcall[room]
       roster = rollcall.remaining
       if absent in rollcall.remaining
-        msg.send "@#{msg.message.user.name} is standing in for #{absent}!"
+        msg.send "<@#{msg.message.user.id}|#{msg.message.user.name}> is standing in for #{absent}!"
         newAttendees = roster.filter (e) -> e != absent
         if newAttendees.length == 0
           completeRollcall(msg)
@@ -85,10 +85,9 @@ module.exports = (robot) ->
       msg.send "No rollcall in progress."
 
   robot.respond /rollcall status/i, (msg) ->
-    msg.send "Status command"
     room = msg.message.room
     if robot.brain.data.rollcall?[room]
-      msg.send "Rollcall in progress.  Waiting for #{robot.brain.data.rollcall[room].remaining.length} of #{robot.brain.data.rollcall[room].attendees.length} paticipants - #{robot.brain.data.rollcall[room].remaining.join(' ')}"
+      msg.send "Rollcall in progress.  Waiting for #{robot.brain.data.rollcall[room].remaining.length} of #{robot.brain.data.rollcall[room].attendees.length} participants - #{robot.brain.data.rollcall[room].remaining.join(' ')}"
     else
       msg.send "No rollcall in progress!  Start one with '#{robot.name} rollcall start @user1 ... @userN'"
 
