@@ -47,7 +47,7 @@ module.exports = (robot) ->
       remaining: attendees,
     }
 
-  robot.respond /(?:\bhere\b|\bpresent\b|:raised_hand:)/, (msg) ->
+  robot.respond /(?:\bhere\b|\bpresent\b|:raised_hand:)/i, (msg) ->
     room = msg.message.room
     if robot.brain.data.rollcall?[room] and not robot.brain.data.rollcall[room].finish?
       rollcall = robot.brain.data.rollcall[room]
