@@ -1,3 +1,7 @@
+v0.1.3
+======
+* Added howto prompts to rollcall start announcement
+
 v0.1.2
 ======
 * Fixed case sensitivity on check-in command

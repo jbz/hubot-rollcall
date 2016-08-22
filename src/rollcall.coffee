@@ -38,6 +38,8 @@ module.exports = (robot) ->
     attendees = (msg.match[1].split " ").filter (x) -> x.charAt(0) == "@"
     attendees = attendees.unique()
     msg.send "Starting a rollcall at #{formatDate(new Date())} for the following attendees: #{attendees.join(" ")}"
+    msg.send "If you're here, please say `#{robot.name} here`."
+    msg.send "If you're subbing for someone, please say `#{robot.name} sub for @<username>`."
 
     # Store new rollcall in brain
     robot.brain.data.rollcall or= {}
