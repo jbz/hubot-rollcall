@@ -61,7 +61,7 @@ module.exports = (robot) ->
         msgToSend += "<@#{msg.message.user.id}|#{msg.message.user.name}> is here! "
         newAttendees = roster.filter (e) -> e != ("@" + msg.message.user.name)
         if newAttendees.length == 0
-          completeRollcall(msg)
+          completeRollcall(msg,msgToSend)
           return
         robot.brain.data.rollcall[room].remaining = newAttendees
         msgToSend += "(#{rollcall.attendees.length - newAttendees.length}/#{rollcall.attendees.length})"
@@ -82,7 +82,7 @@ module.exports = (robot) ->
         msgToSend += "<@#{msg.message.user.id}|#{msg.message.user.name}> is standing in for #{absent}! "
         newAttendees = roster.filter (e) -> e != absent
         if newAttendees.length == 0
-          completeRollcall(msg)
+          completeRollcall(msg,msgToSend)
           return
         robot.brain.data.rollcall[room].remaining = newAttendees
         msgToSend += "(#{rollcall.attendees.length - newAttendees.length}/#{rollcall.attendees.length})"
@@ -113,10 +113,9 @@ Array::unique = ->
   output[@[key]] = @[key] for key in [0...@length]
   value for key, value of output
 
-completeRollcall = (msg) ->
+completeRollcall = (msg,msgToSend) ->
   room = msg.message.room
   count = robot.brain.data.rollcall[room].attendees.length
-  msgToSend = ""
   msgToSend += "(#{count}/#{count}) present or accounted for!\n"
   delete robot.brain.data.rollcall[room]
   msgToSend += "Rollcall COMPLETED at #{formatDate(new Date())}"

@@ -1,4 +1,9 @@
+v0.1.5
+======
+* Fixed bug in rollcall completion message
+
 v0.1.4
+======
 * Fixed message composition to fix out-of-order msgs
 * Made the 'for' in sub command optional
 
