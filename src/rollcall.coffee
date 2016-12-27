@@ -6,7 +6,7 @@
 #   hubot rollcall <user1> <user2> ... <userN> - start a rollcall of the named users
 #   hubot rollcall cancel - cancel the current rollcall
 #   hubot rollcall status - get status of current rollcall
-#   hubot here|present|:raise_hand: - announce your presence for rollcall
+#   hubot here|present|:raised_hand: - announce your presence for rollcall
 #   hubot sub(stitute)|standin|stand-in for <user1> - act as standin for user1
 #
 # Author:
@@ -22,7 +22,7 @@ module.exports = (robot) ->
              #{robot.name} rollcall start <user1> ... <userN> - start a rollcall for the listed users
              #{robot.name} rollcall cancel - cancel the current rollcall
              #{robot.name} rollcall status - see who we're still waiting for
-             #{robot.name} here|present|raised_hand - indicate you are present for the rollcall
+             #{robot.name} here|present|:raised_hand: - indicate you are present for the rollcall
              #{robot.name} sub|substitute|stand-in for <user> - indicate you are subbing for <user>
              """
   robot.respond /debug/, (msg) ->
@@ -71,9 +71,9 @@ module.exports = (robot) ->
     else
       msg.send "No rollcall in progress."
 
-  robot.respond /(?:\bsub\b|\bsubstitute\b|\bstandin\b|stand-in\b) for (\@.*?) *$/i, (msg) ->
+  robot.respond /(?:\bsub\b|\bsubstitute\b|\bstandin\b|stand-in\b) (for ){0,1}(\@.*?) *$/i, (msg) ->
     room = msg.message.room
-    absent = msg.match[1]
+    absent = msg.match[2]
     if robot.brain.data.rollcall?[room] and not robot.brain.data.rollcall[room].finish?
       rollcall = robot.brain.data.rollcall[room]
       roster = rollcall.remaining

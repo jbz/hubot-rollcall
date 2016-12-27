@@ -1,3 +1,7 @@
+v0.1.4
+* Fixed message composition to fix out-of-order msgs
+* Made the 'for' in sub command optional
+
 v0.1.3
 ======
 * Added howto prompts to rollcall start announcement
