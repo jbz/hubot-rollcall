@@ -37,9 +37,11 @@ module.exports = (robot) ->
     # Get list of actual usernames in rollcall list
     attendees = (msg.match[1].split " ").filter (x) -> x.charAt(0) == "@"
     attendees = attendees.unique()
-    msg.send "Starting a rollcall at #{formatDate(new Date())} for the following attendees: #{attendees.join(" ")}"
-    msg.send "If you're here, please say `#{robot.name} here`."
-    msg.send "If you're subbing for someone, please say `#{robot.name} sub for @<username>`."
+    msgToSend = ""
+    msgToSend += "Starting a rollcall at #{formatDate(new Date())} for the following attendees: #{attendees.join(" ")}\n"
+    msgToSend += "If you're here, please say `#{robot.name} here`.\n"
+    msgToSend += "If you're subbing for someone, please say `#{robot.name} sub for @<username>`."
+    msg.send msgToSend
 
     # Store new rollcall in brain
     robot.brain.data.rollcall or= {}
@@ -51,17 +53,19 @@ module.exports = (robot) ->
 
   robot.respond /(?:\bhere\b|\bpresent\b|:raised_hand:)/i, (msg) ->
     room = msg.message.room
+    msgToSend = ""
     if robot.brain.data.rollcall?[room] and not robot.brain.data.rollcall[room].finish?
       rollcall = robot.brain.data.rollcall[room]
       roster = rollcall.remaining
       if ("@" + msg.message.user.name) in rollcall.remaining
-        msg.send "<@#{msg.message.user.id}|#{msg.message.user.name}> is here!"
+        msgToSend += "<@#{msg.message.user.id}|#{msg.message.user.name}> is here! "
         newAttendees = roster.filter (e) -> e != ("@" + msg.message.user.name)
         if newAttendees.length == 0
           completeRollcall(msg)
           return
         robot.brain.data.rollcall[room].remaining = newAttendees
-        msg.send "(#{rollcall.attendees.length - newAttendees.length}/#{rollcall.attendees.length}) are here!"
+        msgToSend += "(#{rollcall.attendees.length - newAttendees.length}/#{rollcall.attendees.length})"
+        msg.send msgToSend
       else
         msg.send "We're not looking for you right now."
     else
@@ -74,13 +78,15 @@ module.exports = (robot) ->
       rollcall = robot.brain.data.rollcall[room]
       roster = rollcall.remaining
       if absent in rollcall.remaining
-        msg.send "<@#{msg.message.user.id}|#{msg.message.user.name}> is standing in for #{absent}!"
+        msgToSend = ""
+        msgToSend += "<@#{msg.message.user.id}|#{msg.message.user.name}> is standing in for #{absent}! "
         newAttendees = roster.filter (e) -> e != absent
         if newAttendees.length == 0
           completeRollcall(msg)
           return
         robot.brain.data.rollcall[room].remaining = newAttendees
-        msg.send "(#{rollcall.attendees.length - newAttendees.length}/#{rollcall.attendees.length}) are here!"
+        msgToSend += "(#{rollcall.attendees.length - newAttendees.length}/#{rollcall.attendees.length})"
+        msg.send msgToSend
       else
         msg.send "We're not waiting for that person!"
     else
@@ -110,6 +116,8 @@ Array::unique = ->
 completeRollcall = (msg) ->
   room = msg.message.room
   count = robot.brain.data.rollcall[room].attendees.length
-  msg.send "(#{count}/#{count}) present or accounted for!"
+  msgToSend = ""
+  msgToSend += "(#{count}/#{count}) present or accounted for!\n"
   delete robot.brain.data.rollcall[room]
-  msg.send "Rollcall COMPLETED at #{formatDate(new Date())}"
+  msgToSend += "Rollcall COMPLETED at #{formatDate(new Date())}"
+  msg.send msgToSend
